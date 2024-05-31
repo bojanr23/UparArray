@@ -1,0 +1,101 @@
+makeDescriptor(numbers, count, size)
+{
+    const maxSymbols = 127;
+    const maxNumbers = 8;
+    if (numbers)
+    {    
+        if (count > maxNumbers)
+            count = maxNumbers;
+
+        if (count < 1)
+            count = 1;
+
+        if (size < 0)
+            size = 0;
+
+        if (size == 3)
+            size = 4;
+
+        if (((size > 4) && (size < 8)) || (size > 8))
+            size = 8;
+    }
+    else
+    {
+        if (count > maxSymbols)
+            count = maxSymbols;
+
+        if (count < 0)
+            count = 0;
+    }
+
+    return ((numbers == 0) << 7) + (numbers ? ((count - 1) << 4) + size : count);
+}
+
+main()
+{
+    const bufLen = 64; // maksimalna dužina niza
+    new buf{bufLen}; // sadržaj niza
+    new len; // aktuelna dužina
+    buf{len++} = 0x7F; // tip podataka - univerzalna struktura
+    
+    new var0=1;       //Umesto cifara mozemo staviti GetVar(x) funkciju za citanje globalnih varijabli
+    new var1=10;
+    new var2=100;
+    new var3=1000;
+    new var4=10000;  
+    new var5=100000;
+    new var6=1000000;
+    new var7=10000000;
+    new var8=100000000;
+
+    buf{len++} = makeDescriptor(1, 8, 4); //  Deskriptor: "brojevi" tip podataka, količina 8, veličina memorije broja 4 bytes
+    new num[1]; // array for a 4-byte number
+
+    num[0] = var0;          // Upar0
+    swapBuf(num, 4); //  as the order on the server is little-endian
+    new i; // counter
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i}; 
+
+    num[0] = var1;          // Upar1
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i}; 
+
+    num[0] = var2;          // Upar2
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i}; 
+
+    num[0] = var3;          // Upar3
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i};
+
+     num[0] = var4;         // Upar4
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i};
+
+    num[0] = var5;          // Upar5
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i}; 
+
+    num[0] = var6;          // Upar6
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i};
+
+    num[0] = var7;          // Upar7
+    swapBuf(num, 4);
+    for (i = 0; i < 4; i++)
+        buf{len++} = num{i}; 
+
+    // Dijagnostika i zapisivanje bafera
+    Diagnostics("Duzina niza =%d: 0x", len);
+    DiagnosticsHex(buf, len);
+    
+    const USER_ARRAY_TAG = 0x6A;
+    TagWriteArray(USER_ARRAY_TAG, len, buf);
+}
